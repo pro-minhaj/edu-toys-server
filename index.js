@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
@@ -32,6 +32,37 @@ async function run() {
     app.get("/", (req, res) => {
       res.send("Hello World!");
     });
+
+    app.get('/cars', async(req, res) => {
+        const query = {categoryID: "cars"};
+        const result = await productsDB.find(query).toArray();;
+        res.send(result)
+    })
+
+    app.get('/trucks', async(req, res) => {
+        const query = {categoryID: "trucks"};
+        const result = await productsDB.find(query).toArray();;
+        res.send(result)
+    })
+
+    app.get('/airplane', async(req, res) => {
+        const query = {categoryID: "airplanes"};
+        const result = await productsDB.find(query).toArray();;
+        res.send(result)
+    })
+
+    app.get('/bikes', async(req, res) => {
+        const query = {categoryID: "bikes"};
+        const result = await productsDB.find(query).toArray();;
+        res.send(result)
+    })
+
+    app.get('/product/:id', async(req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const result = await productsDB.findOne(query);
+        res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
