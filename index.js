@@ -66,9 +66,25 @@ async function run() {
 
     // Add New Toy
     app.post("/addnewtoy", async (req, res) => {
-        const toy = req.body;
-        const result = await productsDB.insertOne(toy);
-        res.send(result)
+      const toy = req.body;
+      const result = await productsDB.insertOne(toy);
+      res.send(result);
+    });
+
+    // Total Product
+    app.get('/totalproduct', async(req, res) => {
+      const total = await productsDB.estimatedDocumentCount();
+      res.send({total})
+    })
+
+    // All Toys
+    app.get("/products", async (req, res) => {
+      const {page, limit} = req.query;
+      const pageNumber = parseInt(page) || 1;
+      const itemsPerPage = parseInt(limit) || 8;
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const result = await productsDB.find().skip(skip).limit(itemsPerPage).toArray();
+      res.send(result);
     });
 
 
