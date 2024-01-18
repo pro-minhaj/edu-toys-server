@@ -80,13 +80,51 @@ async function run() {
       res.send(result);
     });
 
+    // Toy Update
+    app.get("/product-id", async (req, res) => {
+      const { id } = req.query;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsDB.findOne(query);
+      res.send(result);
+    });
+
+    // Toy PATCH
+    app.patch("/product-id-update", async (req, res) => {
+      const { id } = req.query;
+      const filter = { _id: new ObjectId(id) };
+      const toy = req.body;
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          name: toy.name,
+          price: toy.price,
+          picture: toy.picture,
+          categoryID: toy.categoryID,
+          userName: toy.userName,
+          email: toy.email,
+          ratings: toy.ratings,
+          description: toy.description,
+        },
+      };
+      const result = await productsDB.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    // Delete Toy
+    app.delete("/products-delete", async (req, res) => {
+      const { id } = req.query;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsDB.deleteOne(query);
+      res.send(result);
+    });
+
     // User My Toys
-    app.get('/mytoys', async(req, res) => {
-      const {email} = req.query;
-      const query = {email: email};
+    app.get("/mytoys", async (req, res) => {
+      const { email } = req.query;
+      const query = { email: email };
       const result = await productsDB.find(query).toArray();
-      res.send(result)
-    })
+      res.send(result);
+    });
 
     // Total Product
     app.get("/totalproduct", async (req, res) => {
