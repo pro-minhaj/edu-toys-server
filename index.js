@@ -28,6 +28,15 @@ async function run() {
     const database = client.db("eduToysDB");
     const productsDB = database.collection("products");
 
+    // JWT
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1d",
+      });
+      res.send({ token });
+    });
+
     // API Create
     app.get("/", (req, res) => {
       res.send("Hello World!");
@@ -71,22 +80,40 @@ async function run() {
       res.send(result);
     });
 
-    // Total Product
-    app.get('/totalproduct', async(req, res) => {
-      const total = await productsDB.estimatedDocumentCount();
-      res.send({total})
+    // User My Toys
+    app.get('/mytoys', async(req, res) => {
+      const {email} = req.query;
+      const query = {email: email};
+      const result = await productsDB.find(query).toArray();
+      res.send(result)
     })
+
+    // Total Product
+    app.get("/totalproduct", async (req, res) => {
+      const total = await productsDB.estimatedDocumentCount();
+      res.send({ total });
+    });
 
     // All Toys
     app.get("/products", async (req, res) => {
-      const {page, limit} = req.query;
+      const { page, limit } = req.query;
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(limit) || 8;
       const skip = (pageNumber - 1) * itemsPerPage;
-      const result = await productsDB.find().skip(skip).limit(itemsPerPage).toArray();
+      const result = await productsDB
+        .find()
+        .skip(skip)
+        .limit(itemsPerPage)
+        .toArray();
       res.send(result);
     });
 
+    // Search Product
+    app.get("/all-products", async (req, res) => {
+      const result = await productsDB.find().toArray();
+      console.log(result);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
